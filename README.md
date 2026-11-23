@@ -59,7 +59,7 @@ To check a release by hand: `sha256sum -c SHA256SUMS`.
 
 Releases are tagged with the firmware's version from [`Version.h`](Version.h), a date, with a `v`:
 
-- `v<VERSION>` (for example `v20260424`) is a release, and becomes the latest release.
+- `v<VERSION>` (for example `v20261123`) is a release, and becomes the latest release.
 - `v<VERSION>-<suffix>` is a pre-release: `-test` while a change is being tried, `-beta` once it works.
 
 A tag that does not match `Version.h` fails the build. Builds that are not tagged are named `v<VERSION>-g<commit>`.
