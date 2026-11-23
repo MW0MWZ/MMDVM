@@ -72,6 +72,36 @@ The firmware and [MMDVM-Host](https://github.com/g4klx/MMDVM-Host) are upgraded 
 - new information is only sent in answer to a new command, which older firmware refuses (NAK), so the host knows not to ask again;
 - existing messages, the version string and the configuration layout are never changed.
 
+### Display port speed (`0x8F`)
+
+The display port (the Nextion serial port, `SERIAL_REPEATER`) runs at `SERIAL_REPEATER_BAUD_RATE` (9600). A host can change its speed for a while, for example to load a screen design faster:
+
+| | |
+|---|---|
+| Command | `E0 07 8F` followed by the speed as 4 bytes, least significant first (115200 is `00 C2 01 00`) |
+| Speeds | 9600, 19200, 38400, 57600 or 115200 |
+| Reply | ACK once the port runs at the new speed; NAK 4 for any other speed or length |
+
+Anything already queued for the display is sent at the old speed first. The speed goes back to `SERIAL_REPEATER_BAUD_RATE` on the next `GET_VERSION` (which every host sends when it opens the modem) and on a reset. Nothing changes unless the command is sent. Firmware without this command, and builds without `SERIAL_REPEATER`, answer NAK 1.
+
+### LEDs off (`0x8E`)
+
+The LEDs work as always unless a host switches them off:
+
+| | |
+|---|---|
+| Command | `E0 04 8E 01` switches the COS and mode LEDs off; `E0 04 8E 00` puts them back to normal |
+| Reply | ACK; NAK 4 for any other value or length |
+
+Switched off, the LEDs stay dark until they are switched back on or the modem is reset. `GET_VERSION` does not switch them back on, so the setting survives a host opening the modem. Switched back on, they show the modem's state again at once.
+
+Only LEDs change:
+
+- the service LED goes dark too where it is constant (`CONSTANT_SRV_LED`); where it blinks it keeps blinking, as it may be what keeps an external hardware watchdog from resetting the modem;
+- the PTT line and the mode pins (`MODE_PINS`, which switch external channels or filters) are not LEDs and always follow the modem.
+
+Firmware without this command answers NAK 1.
+
 ## Building
 
 The build needs the ARM GCC toolchain, `make`, `git`, `jq` and the [STM32F4XX_Lib](https://github.com/juribeparada/STM32F4XX_Lib) and [STM32F7XX_Lib](https://github.com/juribeparada/STM32F7XX_Lib) submodules. To build every board as CI does, in Docker:
