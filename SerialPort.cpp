@@ -81,6 +81,11 @@ const uint8_t MMDVM_NAK          = 0x7FU;
 const uint8_t MMDVM_SERIAL_DATA  = 0x80U;
 const uint8_t MMDVM_I2C_DATA     = 0x81U;
 
+// Pi-Star: the COS and mode LEDs dark (1) or as normal (0), until a reset
+const uint8_t MMDVM_LEDS         = 0x8EU;
+// Pi-Star: sets the display port's speed until the next GET_VERSION or reset
+const uint8_t MMDVM_SERIAL_SPEED = 0x8FU;
+
 const uint8_t MMDVM_TRANSPARENT  = 0x90U;
 const uint8_t MMDVM_QSO_INFO     = 0x91U;
 
@@ -135,7 +140,8 @@ m_ptr(0U),
 m_len(0U),
 m_debug(false),
 m_lastSerialAvail(0),
-m_lastSerialAvailCount(0U)
+m_lastSerialAvailCount(0U),
+m_serialSpeed(0U)
 {
 }
 
@@ -810,16 +816,52 @@ void CSerialPort::start()
   beginInt(1U, SERIAL_SPEED);
 
 #if defined(SERIAL_REPEATER)
-  #if defined(SERIAL_REPEATER_BAUD_RATE)
-    beginInt(3U, SERIAL_REPEATER_BAUD_RATE);
-  #else
-    beginInt(3U, 9600);
-  #endif
+  beginInt(3U, SERIAL_REPEATER_SPEED);
+  m_serialSpeed = SERIAL_REPEATER_SPEED;
 #endif
 #if defined(I2C_REPEATER)
   beginInt(10U, 9600);
 #endif
 }
+
+#if defined(SERIAL_REPEATER)
+// The display port's speed: one of the speeds a Nextion display takes,
+// as 4 bytes, least significant first. It holds until the next GET_VERSION
+// (any host opening the modem) or a reset, which set SERIAL_REPEATER_SPEED.
+uint8_t CSerialPort::setSerialSpeed(const uint8_t* data, uint16_t length)
+{
+  if (length != 4U)
+    return 4U;
+
+  uint32_t speed = data[0U] | (data[1U] << 8) | (uint32_t(data[2U]) << 16) | (uint32_t(data[3U]) << 24);
+
+  switch (speed) {
+    case 9600U:
+    case 19200U:
+    case 38400U:
+    case 57600U:
+    case 115200U:
+      applySerialSpeed(speed);
+      return 0U;
+    default:
+      return 4U;
+  }
+}
+
+void CSerialPort::applySerialSpeed(uint32_t speed)
+{
+  if (speed == m_serialSpeed)
+    return;
+
+  // What was sent at the old speed goes first
+  writeInt(3U, NULL, 0U, true);
+
+  beginInt(3U, speed);
+  m_serialSpeed          = speed;
+  m_lastSerialAvail      = 0;
+  m_lastSerialAvailCount = 0U;
+}
+#endif
 
 void CSerialPort::process()
 {
@@ -901,6 +943,9 @@ void CSerialPort::processMessage(uint8_t type, const uint8_t* buffer, uint16_t l
       break;
 
     case MMDVM_GET_VERSION:
+#if defined(SERIAL_REPEATER)
+      applySerialSpeed(SERIAL_REPEATER_SPEED);
+#endif
       getVersion();
       break;
 
@@ -1247,7 +1292,24 @@ void CSerialPort::processMessage(uint8_t type, const uint8_t* buffer, uint16_t l
     case MMDVM_SERIAL_DATA:
       writeInt(3U, buffer, length);
       break;
+
+    case MMDVM_SERIAL_SPEED:
+      err = setSerialSpeed(buffer, length);
+      if (err == 0U)
+        sendACK(type);
+      else
+        sendNAK(type, err);
+      break;
 #endif
+
+    case MMDVM_LEDS:
+      if (length == 1U && buffer[0U] <= 1U) {
+        io.setLedsOff(buffer[0U] == 1U);
+        sendACK(type);
+      } else {
+        sendNAK(type, 4U);
+      }
+      break;
 
 #if defined(I2C_REPEATER)
     case MMDVM_I2C_DATA:

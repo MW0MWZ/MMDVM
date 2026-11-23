@@ -220,56 +220,56 @@ void CIO::setPTTInt(bool on)
 
 void CIO::setCOSInt(bool on)
 {
-  digitalWrite(PIN_COSLED, on ? HIGH : LOW);
+  digitalWrite(PIN_COSLED, (on && !m_ledsOff) ? HIGH : LOW);
 }
 
 void CIO::setDStarInt(bool on)
 {
-  digitalWrite(PIN_DSTAR, on ? HIGH : LOW);
+  digitalWrite(PIN_DSTAR, (on && !m_ledsOff) ? HIGH : LOW);
 }
 
 void CIO::setDMRInt(bool on)
 {
-  digitalWrite(PIN_DMR, on ? HIGH : LOW);
+  digitalWrite(PIN_DMR, (on && !m_ledsOff) ? HIGH : LOW);
 }
 
 void CIO::setYSFInt(bool on)
 {
-  digitalWrite(PIN_YSF, on ? HIGH : LOW);
+  digitalWrite(PIN_YSF, (on && !m_ledsOff) ? HIGH : LOW);
 }
 
 void CIO::setP25Int(bool on)
 {
-  digitalWrite(PIN_P25, on ? HIGH : LOW);
+  digitalWrite(PIN_P25, (on && !m_ledsOff) ? HIGH : LOW);
 }
 
 void CIO::setNXDNInt(bool on)
 {
 #if defined(USE_ALTERNATE_NXDN_LEDS)
-  digitalWrite(PIN_YSF, on ? HIGH : LOW);
-  digitalWrite(PIN_P25, on ? HIGH : LOW);
+  digitalWrite(PIN_YSF, (on && !m_ledsOff) ? HIGH : LOW);
+  digitalWrite(PIN_P25, (on && !m_ledsOff) ? HIGH : LOW);
 #else
-  digitalWrite(PIN_NXDN, on ? HIGH : LOW);
+  digitalWrite(PIN_NXDN, (on && !m_ledsOff) ? HIGH : LOW);
 #endif
 }
 
 void CIO::setPOCSAGInt(bool on)
 {
 #if defined(USE_ALTERNATE_POCSAG_LEDS)
-  digitalWrite(PIN_DSTAR, on ? HIGH : LOW);
-  digitalWrite(PIN_DMR,   on ? HIGH : LOW);
+  digitalWrite(PIN_DSTAR, (on && !m_ledsOff) ? HIGH : LOW);
+  digitalWrite(PIN_DMR,   (on && !m_ledsOff) ? HIGH : LOW);
 #else
-  digitalWrite(PIN_POCSAG, on ? HIGH : LOW);
+  digitalWrite(PIN_POCSAG, (on && !m_ledsOff) ? HIGH : LOW);
 #endif
 }
 
 void CIO::setFMInt(bool on)
 {
 #if defined(USE_ALTERNATE_FM_LEDS)
-  digitalWrite(PIN_DSTAR, on ? HIGH : LOW);
-  digitalWrite(PIN_YSF,   on ? HIGH : LOW);
+  digitalWrite(PIN_DSTAR, (on && !m_ledsOff) ? HIGH : LOW);
+  digitalWrite(PIN_YSF,   (on && !m_ledsOff) ? HIGH : LOW);
 #else
-  digitalWrite(PIN_FM, on ? HIGH : LOW);
+  digitalWrite(PIN_FM, (on && !m_ledsOff) ? HIGH : LOW);
 #endif
 }
 

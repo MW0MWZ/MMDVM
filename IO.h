@@ -41,6 +41,7 @@ public:
   uint16_t getSpace() const;
 
   void setDecode(bool dcd);
+  void setLedsOff(bool off);
   void setADCDetection(bool detect);
   void setMode(MMDVM_STATE state);
   
@@ -126,6 +127,7 @@ private:
 
   uint32_t             m_ledCount;
   bool                 m_ledValue;
+  bool                 m_ledsOff;
 
   bool                 m_detect;
 

@@ -21,6 +21,13 @@
 
 #include "Config.h"
 #include "Globals.h"
+
+// The display port's speed at a reset (and after GET_VERSION)
+#if defined(SERIAL_REPEATER_BAUD_RATE)
+#define SERIAL_REPEATER_SPEED SERIAL_REPEATER_BAUD_RATE
+#else
+#define SERIAL_REPEATER_SPEED 9600
+#endif
 #include "RingBuffer.h"
 
 #if !defined(SERIAL_SPEED)
@@ -96,8 +103,13 @@ private:
   bool      m_debug;
   int       m_lastSerialAvail;
   uint16_t  m_lastSerialAvailCount;
+  uint32_t  m_serialSpeed;
 
   void    sendACK(uint8_t type);
+#if defined(SERIAL_REPEATER)
+  uint8_t setSerialSpeed(const uint8_t* data, uint16_t length);
+  void    applySerialSpeed(uint32_t speed);
+#endif
   void    sendNAK(uint8_t type, uint8_t err);
   void    getStatus();
   void    getVersion();

@@ -382,13 +382,13 @@ void CIO::setPTTInt(bool on)
 
 void CIO::setCOSInt(bool on)
 {
-   GPIO_WriteBit(PORT_COSLED, PIN_COSLED, on ? Bit_SET : Bit_RESET);
+   GPIO_WriteBit(PORT_COSLED, PIN_COSLED, (on && !m_ledsOff) ? Bit_SET : Bit_RESET);
 }
 
 void CIO::setDStarInt(bool on)
 {
 #if defined(MODE_LEDS)
-   GPIO_WriteBit(PORT_DSTAR, PIN_DSTAR, on ? Bit_SET : Bit_RESET);
+   GPIO_WriteBit(PORT_DSTAR, PIN_DSTAR, (on && !m_ledsOff) ? Bit_SET : Bit_RESET);
 #endif
 #if defined(MODE_PINS) && defined(STM32F4_NUCLEO_MORPHO_HEADER) && (defined(STM32F4_NUCLEO) || defined(STM32F722_RPT_HAT))
    GPIO_WriteBit(PORT_MDSTAR, PIN_MDSTAR, on ? Bit_SET : Bit_RESET);
@@ -398,7 +398,7 @@ void CIO::setDStarInt(bool on)
 void CIO::setDMRInt(bool on)
 {
 #if defined(MODE_LEDS)
-   GPIO_WriteBit(PORT_DMR, PIN_DMR, on ? Bit_SET : Bit_RESET);
+   GPIO_WriteBit(PORT_DMR, PIN_DMR, (on && !m_ledsOff) ? Bit_SET : Bit_RESET);
 #endif
 #if defined(MODE_PINS) && defined(STM32F4_NUCLEO_MORPHO_HEADER) && (defined(STM32F4_NUCLEO) || defined(STM32F722_RPT_HAT))
    GPIO_WriteBit(PORT_MDMR, PIN_MDMR, on ? Bit_SET : Bit_RESET);
@@ -408,7 +408,7 @@ void CIO::setDMRInt(bool on)
 void CIO::setYSFInt(bool on)
 {
 #if defined(MODE_LEDS)
-   GPIO_WriteBit(PORT_YSF, PIN_YSF, on ? Bit_SET : Bit_RESET);
+   GPIO_WriteBit(PORT_YSF, PIN_YSF, (on && !m_ledsOff) ? Bit_SET : Bit_RESET);
 #endif
 #if defined(MODE_PINS) && defined(STM32F4_NUCLEO_MORPHO_HEADER) && (defined(STM32F4_NUCLEO) || defined(STM32F722_RPT_HAT))
    GPIO_WriteBit(PORT_MYSF, PIN_MYSF, on ? Bit_SET : Bit_RESET);
@@ -418,7 +418,7 @@ void CIO::setYSFInt(bool on)
 void CIO::setP25Int(bool on)
 {
 #if defined(MODE_LEDS)
-   GPIO_WriteBit(PORT_P25, PIN_P25, on ? Bit_SET : Bit_RESET);
+   GPIO_WriteBit(PORT_P25, PIN_P25, (on && !m_ledsOff) ? Bit_SET : Bit_RESET);
 #endif
 #if defined(MODE_PINS) && defined(STM32F4_NUCLEO_MORPHO_HEADER) && (defined(STM32F4_NUCLEO) || defined(STM32F722_RPT_HAT))
    GPIO_WriteBit(PORT_MP25, PIN_MP25, on ? Bit_SET : Bit_RESET);
@@ -429,10 +429,10 @@ void CIO::setNXDNInt(bool on)
 {
 #if defined(MODE_LEDS)
 #if defined(USE_ALTERNATE_NXDN_LEDS)
-   GPIO_WriteBit(PORT_YSF, PIN_YSF, on ? Bit_SET : Bit_RESET);
-   GPIO_WriteBit(PORT_P25, PIN_P25, on ? Bit_SET : Bit_RESET);
+   GPIO_WriteBit(PORT_YSF, PIN_YSF, (on && !m_ledsOff) ? Bit_SET : Bit_RESET);
+   GPIO_WriteBit(PORT_P25, PIN_P25, (on && !m_ledsOff) ? Bit_SET : Bit_RESET);
 #else
-   GPIO_WriteBit(PORT_NXDN, PIN_NXDN, on ? Bit_SET : Bit_RESET);
+   GPIO_WriteBit(PORT_NXDN, PIN_NXDN, (on && !m_ledsOff) ? Bit_SET : Bit_RESET);
 #endif
 #endif
 
@@ -450,10 +450,10 @@ void CIO::setPOCSAGInt(bool on)
 {
 #if defined(MODE_LEDS)
 #if defined(USE_ALTERNATE_POCSAG_LEDS)
-   GPIO_WriteBit(PORT_DSTAR, PIN_DSTAR, on ? Bit_SET : Bit_RESET);
-   GPIO_WriteBit(PORT_DMR,   PIN_DMR,   on ? Bit_SET : Bit_RESET);
+   GPIO_WriteBit(PORT_DSTAR, PIN_DSTAR, (on && !m_ledsOff) ? Bit_SET : Bit_RESET);
+   GPIO_WriteBit(PORT_DMR,   PIN_DMR,   (on && !m_ledsOff) ? Bit_SET : Bit_RESET);
 #else
-   GPIO_WriteBit(PORT_POCSAG,  PIN_POCSAG, on ? Bit_SET : Bit_RESET);
+   GPIO_WriteBit(PORT_POCSAG,  PIN_POCSAG, (on && !m_ledsOff) ? Bit_SET : Bit_RESET);
 #endif
 #endif
 
@@ -471,10 +471,10 @@ void CIO::setFMInt(bool on)
 {
 #if defined(MODE_LEDS)
 #if defined(USE_ALTERNATE_FM_LEDS)
-   GPIO_WriteBit(PORT_DSTAR, PIN_DSTAR, on ? Bit_SET : Bit_RESET);
-   GPIO_WriteBit(PORT_YSF,   PIN_YSF,   on ? Bit_SET : Bit_RESET);
+   GPIO_WriteBit(PORT_DSTAR, PIN_DSTAR, (on && !m_ledsOff) ? Bit_SET : Bit_RESET);
+   GPIO_WriteBit(PORT_YSF,   PIN_YSF,   (on && !m_ledsOff) ? Bit_SET : Bit_RESET);
 #else
-   GPIO_WriteBit(PORT_FM,  PIN_FM, on ? Bit_SET : Bit_RESET);
+   GPIO_WriteBit(PORT_FM,  PIN_FM, (on && !m_ledsOff) ? Bit_SET : Bit_RESET);
 #endif
 #endif
 

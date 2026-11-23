@@ -121,6 +121,7 @@ m_txDCOffset(DC_OFFSET),
 m_useCOSAsLockout(false),
 m_ledCount(0U),
 m_ledValue(true),
+m_ledsOff(false),
 m_detect(false),
 m_adcOverflow(0U),
 m_dacOverflow(0U),
@@ -313,7 +314,7 @@ void CIO::process()
     }
 
 #if defined(CONSTANT_SRV_LED)
-    setLEDInt(true);
+    setLEDInt(!m_ledsOff);
 #else
     if (m_ledCount >= 24000U) {
       m_ledCount = 0U;
@@ -651,6 +652,37 @@ void CIO::setDecode(bool dcd)
     setCOSInt(dcd ? true : false);
 
   m_dcd = dcd;
+}
+
+// The COS and mode LEDs dark until switched back or a reset; switched back,
+// they show the modem's state again. The service LED stays dark too where
+// it is constant (CONSTANT_SRV_LED); where it blinks it is left blinking,
+// as it may be what keeps an external hardware watchdog from resetting the
+// modem. The PTT line and the mode pins (MODE_PINS) are not LEDs and never
+// change.
+void CIO::setLedsOff(bool off)
+{
+  if (off == m_ledsOff)
+    return;
+
+  m_ledsOff = off;
+
+  setCOSInt(m_dcd);
+
+  // The mode's own state, which the pin functions show only while the
+  // LEDs are on (the mode pins share these functions and always follow it)
+#if defined(MODE_LEDS)
+  switch (m_modemState) {
+    case STATE_DSTAR:  setDStarInt(true);  break;
+    case STATE_DMR:    setDMRInt(true);    break;
+    case STATE_YSF:    setYSFInt(true);    break;
+    case STATE_P25:    setP25Int(true);    break;
+    case STATE_NXDN:   setNXDNInt(true);   break;
+    case STATE_POCSAG: setPOCSAGInt(true); break;
+    case STATE_FM:     setFMInt(true);     break;
+    default: break;
+  }
+#endif
 }
 
 void CIO::setADCDetection(bool detect)
